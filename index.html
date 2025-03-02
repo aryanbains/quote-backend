@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Random Quotes</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.gstatic.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    /* Reset some defaults */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(120deg, #6a11cb, #2575fc);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Open Sans', sans-serif;
+      color: #fff;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 20px;
+      animation: fadeDown 0.8s ease-in-out;
+    }
+
+    header h1 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    header p {
+      font-size: 1rem;
+      font-weight: 400;
+      opacity: 0.9;
+    }
+
+    .quote-container {
+      position: relative;
+      text-align: center;
+      padding: 30px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      max-width: 700px;
+      width: 90%;
+      box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    .quote-text {
+      font-size: 1.4rem;
+      margin-bottom: 20px;
+      line-height: 1.6;
+      font-weight: 600;
+    }
+
+    .quote-author {
+      font-size: 1rem;
+      font-style: italic;
+      margin-bottom: 30px;
+      color: #ffd700;
+    }
+
+    .buttons {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 10px;
+    }
+
+    .btn {
+      font-size: 0.9rem;
+      padding: 10px 20px;
+      background: #ffd700;
+      color: #000;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.3s ease;
+    }
+
+    .btn:hover {
+      background: #ffed70;
+    }
+
+    .copy-msg {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: rgba(0,0,0,0.6);
+      color: #fff;
+      padding: 7px 10px;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease-in-out;
+    }
+
+    .show {
+      opacity: 1 !important;
+    }
+
+    @keyframes fadeIn {
+      0%   { opacity: 0; transform: translateY(20px); }
+      100% { opacity: 1; transform: translateY(0);   }
+    }
+
+    @keyframes fadeDown {
+      0%   { opacity: 0; transform: translateY(-20px); }
+      100% { opacity: 1; transform: translateY(0);   }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Daily Inspiration</h1>
+    <p>Refresh your mind with random inspiring quotes</p>
+  </header>
+
+  <div class="quote-container">
+    <div id="copyMsg" class="copy-msg">Quote Copied!</div>
+    <div class="quote-text" id="quoteText">Loading quote...</div>
+    <div class="quote-author" id="quoteAuthor"></div>
+    <div class="buttons">
+      <button class="btn" onclick="getQuote()">Get Another Quote</button>
+      <button class="btn" onclick="copyQuote()">Copy Quote</button>
+    </div>
+  </div>
+
+  <script>
+    // Replace with your backend endpoint
+    const BACKEND_URL = 'https://quote-backend-5bc3.onrender.com/';
+
+    function getQuote() {
+      fetch(BACKEND_URL)
+        .then(response => response.json())
+        .then(data => {
+          document.getElementById('quoteText').innerText = data.quote;
+          document.getElementById('quoteAuthor').innerText = '— ' + (data.author || 'Unknown');
+        })
+        .catch(err => {
+          console.error(err);
+          document.getElementById('quoteText').innerText = 'Oops, an error occurred!';
+          document.getElementById('quoteAuthor').innerText = '';
+        });
+    }
+
+    function copyQuote() {
+      const quoteText = document.getElementById('quoteText').innerText;
+      const quoteAuthor = document.getElementById('quoteAuthor').innerText;
+      const fullQuote = `${quoteText} ${quoteAuthor}`;
+
+      // Create temporary textarea to copy text
+      const tempInput = document.createElement('textarea');
+      tempInput.value = fullQuote;
+      document.body.appendChild(tempInput);
+      tempInput.select();
+      document.execCommand('copy');
+      document.body.removeChild(tempInput);
+
+      // Show "Quote Copied!" message
+      const copyMsg = document.getElementById('copyMsg');
+      copyMsg.classList.add('show');
+      setTimeout(() => copyMsg.classList.remove('show'), 1500);
+    }
+
+    // Load the first quote on page load
+    window.onload = getQuote;
+  </script>
+</body>
+</html>
